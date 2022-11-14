@@ -1,0 +1,357 @@
+
+package aSXM3B2_EAC5P2_Hidalgo_S;
+
+import java.util.Scanner;
+
+
+public class ASXM3B2_EAC5P2_Hidalgo_S {
+
+    static final int ID_USUARI = 0;
+    static final int ID_DNI = 1;
+    static final int ID_DATA_ALTA = 2;
+    static final int ID_DATA_BAIXA = 3;
+    static final int REG_INEXISTENT = -1;
+
+    static final int ID_NIF_TREBALLADOR = 0;
+    static final int ID_USUARI_TREBALLADOR = 1;
+    static final int ID_NOM = 2;
+    Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+    	ASXM3B2_EAC5P2_Hidalgo_S prg = new ASXM3B2_EAC5P2_Hidalgo_S();
+        prg.inici();
+    }
+
+    void inici() {
+        String[][] registre = {
+            //  usuari  NIF DATA_ALTA  DATA_BAIXA
+            {"rgalvez", "99888777Z", "02/01/2020", ""},
+            {"jpuig", "11222333A", "10/02/2020", "10/05/2020"},
+            {"rsoto", "45821635K", "15/02/2020", "15/05/2020"},
+            {"agarcia", "88111666S", "20/02/2020", "20/02/2021"},
+            {"fgarcia", "34985423A", "25/03/2020", "25/09/2020"},
+            {"rsoto", "45821635K", "01/04/2021", ""},
+            {"jpuig", "11222333A", "15/04/2021", ""},
+            {"ralonso", "22333444B", "10/05/2021", ""},
+            {"fgarcia", "34985423A", "01/06/2021", "30/09/2021"},
+            {"efuster", "33444555C", "08/06/2021", "08/10/2021"},
+            {"sfont", "44555666D", "10/06/2021", "10/11/2021"},
+            {"msoler", "55666777E", "15/06/2021", ""},
+            {"efuster", "33444555C", "01/02/2022", ""},
+            {"sferrer", "66777888F", "10/02/2022", ""},
+            {"jcasas", "77888999G", "01/03/2022", ""},
+            {"", "", "", ""},
+            {"", "", "", ""},
+            {"", "", "", ""},
+            {"", "", "", ""},
+            {"", "", "", ""},
+            {"", "", "", ""}};
+
+        // NIF  USUARI  NOM
+        String[][] treballadors = {{"11222333A", "jpuig", "Josep Puig"},
+        {"34985423A", "fgarcia", "Francesc Garcia"}, {"", "", ""}, {"", "", ""}, {"", "", ""}, {"", "", ""}, {"", "", ""}, {"", "", ""}};
+		
+        CriterisCercaUsuaris criteris = new CriterisCercaUsuaris();
+        
+		Treballador treballador =new Treballador();
+		
+		copiaTreballador(treballadors,treballador);
+		
+        boolean calSortir = false;
+        char opcio;
+        do {
+            System.out.println("");
+            System.out.println("1. Reactivar un usuari");
+            System.out.println("2. Donar de baixa un usuari");
+            System.out.println("3. Mostrar registre");
+            System.out.println("4. Mostrar Usuaris entre any alta i baixa");
+            System.out.println("5. Alta Treballadors");
+            System.out.println("6. Mostrar Treballadors");
+            System.out.println("0. Sortir de l'aplicaciÃ³");
+            opcio = demanarOpcioMenu();
+            switch (opcio) {
+                case '1':
+                    reactivarUsuariDeBaixa(registre);
+                    break;
+                case '2':
+                    donarDeBaixa(registre);
+                    break;
+                case '3':
+                    mostrarRegistre(registre);
+                    break;
+                case '4':
+                    mostraUsuaris(registre, criteris);
+                    break;
+                case '5':
+                    altaTreballador(registre, treballador);
+                    break;
+                case '6':
+                   mostrarTreballadors(treballadors);
+                    break;
+                case '0':
+                    calSortir = true;
+            }
+        } while (!calSortir);
+    }
+
+    char demanarOpcioMenu() {
+        String resp;
+        System.out.print("Esculliu una opciÃ³ (1,2,3 o 0) i premeu [ENTRAR]: ");
+        resp = scanner.nextLine();
+        if (resp.isEmpty()) {
+            resp = " ";
+        }
+        return resp.charAt(0);
+    }
+
+    /**
+     * MÃ¨tode que realitza l'assignacio d'un dispositiu a una persona
+     *
+     * @param registre
+     */
+    void reactivarUsuariDeBaixa(String[][] registre) {
+        String dni;
+        String usuari = "";
+        String dataAlta = "";
+        int fila = 0;
+        System.out.println("Reactivar usuari");
+        System.out.println("================");
+        System.out.print("Dni: ");
+        dni = scanner.nextLine();
+        fila = obtenirFilaPerDniUsuariActiu(registre, dni);
+        if (fila != REG_INEXISTENT) {
+            System.out.println("Aquest usuari estÃ  en actiu");
+        } else if (obtenirFilaPerDniDonatBaixa(registre, dni) == REG_INEXISTENT) {
+            System.out.println("Aquest usuari no existeix");
+        } else {
+            fila = obtenirFilaPerDniDonatBaixa(registre, dni);
+            usuari = obtenirUsuariPerFila(registre, fila);
+            System.out.println("Usuari: " + usuari);
+            System.out.print("Data Alta: ");
+            dataAlta = scanner.nextLine();
+            fila = obtenirFilaPerDonarAlta(registre);
+            if (fila == REG_INEXISTENT) {
+                System.out.println("No hi ha files disponibles");
+            } else {
+                registre[fila][ID_USUARI] = usuari;
+                registre[fila][ID_DNI] = dni;
+                registre[fila][ID_DATA_ALTA] = dataAlta;
+                registre[fila][ID_DATA_BAIXA] = "";
+            }
+        }
+    }
+
+    /**
+     * * MÃ¨tode que realitza la cancelÂ·laciÃ³ de l'assignaciÃ³ d'un dispositiu a
+     * una personarva
+     *
+     * @param registre
+     */
+    void donarDeBaixa(String[][] registre) {
+        String dni;
+        String usuari = "";
+        String dataBaixa = "";
+        int fila = 0;
+        System.out.println("Donar de baixa");
+        System.out.println("==============");
+        System.out.print("Dni: ");
+        dni = scanner.nextLine();
+        fila = obtenirFilaPerDniUsuariActiu(registre, dni);
+        if (fila == REG_INEXISTENT) {
+            System.out.println("Aquest usuari no existeix o no estÃ  en actiu");
+        } else {
+            usuari = obtenirUsuariPerFila(registre, fila);
+            System.out.println("Usuari: " + usuari);
+            System.out.print("Data Baixa: ");
+            dataBaixa = scanner.nextLine();
+            registre[fila][ID_DATA_BAIXA] = dataBaixa;
+        }
+    }
+
+    /**
+     * MÃ¨tode que mostra el registre
+     *
+     * @param registre
+     */
+    void mostrarRegistre(String[][] registre) {
+        System.out.print("Usuari\tDni\t\tAlta\t\tBaixa");
+        for (int fila = 0; fila < registre.length; fila++) {
+            System.out.print("\n" + registre[fila][ID_USUARI] + "\t" + registre[fila][ID_DNI] + "\t" + registre[fila][ID_DATA_ALTA] + "\t" + registre[fila][ID_DATA_BAIXA]);
+        }
+        System.out.println("");
+    }
+
+    /**
+     * MÃ¨tode que obtÃ¨ la fila dins de l'array un dni en actiu
+     *
+     * @param registre
+     * @param dni
+     * @return
+     */
+    int obtenirFilaPerDniUsuariActiu(String[][] registre, String dni) {
+        boolean trobat = false;
+        int posicio = 0;
+        while (!trobat && posicio < registre.length) {
+            if (registre[posicio][ID_DNI].equals(dni) && registre[posicio][ID_DATA_BAIXA].equals("")) {
+                trobat = true;
+            } else {
+                posicio++;
+            }
+        }
+        if (trobat) {
+            return posicio;
+        } else {
+            return REG_INEXISTENT;
+        }
+    }
+
+    /**
+     * MÃ¨tode que obtÃ¨ l'usuari d'una fila dins del registre
+     *
+     * @param registre
+     * @param fila
+     * @return
+     */
+    String obtenirUsuariPerFila(String[][] registre, int fila) {
+        if (fila < 0 || fila >= registre.length) {
+            return "";
+        }
+        return registre[fila][ID_USUARI];
+    }
+
+    /**
+     * MÃ¨tode que obtÃ¨ la fila dins de l'array un dni donat de baixa
+     *
+     * @param registre
+     * @param dni
+     * @return
+     */
+    int obtenirFilaPerDniDonatBaixa(String[][] registre, String dni) {
+        boolean trobat = false;
+        int posicio = 0;
+        while (!trobat && posicio < registre.length) {
+            if (registre[posicio][ID_DNI].equals(dni) && !registre[posicio][ID_DATA_BAIXA].equals("")) {
+                trobat = true;
+            } else {
+                posicio++;
+            }
+        }
+        if (trobat) {
+            return posicio;
+        } else {
+            return REG_INEXISTENT;
+        }
+    }
+
+    int obtenirFilaPerDonarAlta(String[][] registre) {
+        boolean trobat = false;
+        int posicio = 0;
+        while (!trobat && posicio < registre.length) {
+            if (registre[posicio][ID_USUARI].equals("")) {
+                trobat = true;
+            } else {
+                posicio++;
+            }
+        }
+        if (trobat) {
+            return posicio;
+        } else {
+            return REG_INEXISTENT;
+        }
+    }
+
+	void mostrarUsuarisEntreAnyAltaAndBaixa(String[][] registre, CriterisCercaUsuaris criteris) {
+		System.out.printf("\nUsuaris amb alta a l'any %s y baixa %s\n", criteris.anyAlta, criteris.anyBaixa);
+		System.out.println("Usuari\tNif\t\tAlta\t\tBaixa");
+		for (int fila = 0; fila < registre.length; fila++) {
+			if (registre[fila][ID_DATA_ALTA].endsWith(criteris.anyAlta)
+					&& registre[fila][ID_DATA_BAIXA].endsWith(criteris.anyBaixa)) {
+				for (int col = 0; col < registre[fila].length; col++) {
+					System.out.print(registre[fila][col] + "\t");
+				}
+				System.out.println("");
+			}
+		}
+	}
+
+	void mostraUsuaris(String[][] registre, CriterisCercaUsuaris criteris) {
+		System.out.println("Introdueix any d'alta; ");
+		criteris.anyAlta = scanner.nextLine();
+		System.out.println("Introdueix any de baixa; ");
+		criteris.anyBaixa = scanner.nextLine();
+
+		mostrarUsuarisEntreAnyAltaAndBaixa(registre, criteris);
+	}
+
+	void altaTreballador(String[][] registre, Treballador treballador) {
+
+		System.out.println("Intro DNI nou treballador; ");
+		treballador.nif = scanner.nextLine();
+		System.out.println("Intro NICK nou treballador; ");
+		treballador.usuari = scanner.nextLine();
+		System.out.println("Intro NOM REAL nou treballador; ");
+		treballador.nom = scanner.nextLine();
+
+		trobaBuit(registre);
+		int posicioBuida = trobaBuit(registre);
+		if (posicioBuida != REG_INEXISTENT && registre[20][ID_DNI] == "") {
+			registre[posicioBuida][ID_USUARI] = treballador.usuari;
+			registre[posicioBuida][ID_DNI] = treballador.nif;
+						
+			
+		}
+	}
+
+	void copiaTreballador(String[][] treballadors, Treballador treballador) {
+		trobaBuit(treballadors);
+		int posicioBuida = trobaBuitNom(treballadors);
+		
+		for (int i = 0; i < treballadors.length; i++) {
+			treballadors[posicioBuida][ID_NIF_TREBALLADOR] = treballador.nif;
+			treballadors[posicioBuida][ID_USUARI_TREBALLADOR] = treballador.usuari;
+			treballadors[posicioBuida][ID_NOM] = treballador.nom;
+		}
+	}
+
+	/*
+	 * boolean afegirTreballador(String[][] treballadors, Treballador treballador) {
+	 * // TODO }
+	 * 
+	 * boolean existeixTreballador(String[][] treballadors, String nif) { while }
+	 */
+	void mostrarTreballadors(String[][] treballadors) { // TODO }
+		for (int i = 0; i < treballadors.length; i++) {
+			System.out.println(treballadors[i][ID_NOM] + "  " + treballadors[i][ID_USUARI_TREBALLADOR] + "  "
+					+ treballadors[i][ID_NIF_TREBALLADOR]);
+		}
+	}
+
+	// TROBA LA PRIMERA FILA TOTALMENT BUIDA PER AFEGIR USERS
+	int trobaBuit(String[][] registre) {
+		int position = 0;
+		boolean found = false;
+		while (position < registre.length && !found) {
+			if (registre[position][ID_DNI].isEmpty()) {
+				found = true;
+
+			} else {
+				position++;
+			}
+		}
+		return found ? position : -1;
+	}
+	// TROBA LA PRIMERA FILA TOTALMENT BUIDA PER AFEGIR REALS
+		int trobaBuitNom(String[][] treballadors) {
+			int position = 0;
+			boolean found = false;
+			while (position < treballadors.length && !found) {
+				if (treballadors[position][ID_NIF_TREBALLADOR].isEmpty()) {
+					found = true;
+
+				} else {
+					position++;
+				}
+			}
+			return found ? position : -1;
+		}
+}
