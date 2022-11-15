@@ -84,6 +84,8 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
                     break;
                 case '5':
                     altaTreballador(treballadors, treballador);
+                    afegirTreballador(treballadors, treballador);
+                    existeixTreballador(treballadors, null);
                     copiaTreballador(registre,treballador);
                     break;
                 case '6':
@@ -285,26 +287,22 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
 	}
 
 	void altaTreballador(String[][] treballadors, Treballador treballador) {
+		boolean seAcabo = false;
 
-		System.out.println("Intro DNI nou treballador; ");
-		treballador.nif = scanner.nextLine();
-		System.out.println("Intro NICK nou treballador; ");
-		treballador.usuari = scanner.nextLine();
-		System.out.println("Intro NOM REAL nou treballador; ");
-		treballador.nom = scanner.nextLine();
+		if (treballadors[07][ID_NIF_TREBALLADOR] != "") {
+			System.out.println("No es poden afegir més treballadors.");
+			seAcabo = false;
+		} else {
+			System.out.println("Intro DNI nou treballador; ");
+			treballador.nif = scanner.nextLine();
+			System.out.println("Intro NICK nou treballador; ");
+			treballador.usuari = scanner.nextLine();
+			System.out.println("Intro NOM REAL nou treballador; ");
+			treballador.nom = scanner.nextLine();
 
-		trobaBuitNom(treballadors);
-		int posicioBuida = trobaBuitNom(treballadors);
-		for (int i = 0; i < treballadors.length; i++) {
-			if (posicioBuida != REG_INEXISTENT && treballadors[07][ID_DNI] == "") {
-				treballadors[posicioBuida][ID_NIF_TREBALLADOR] = treballador.nif;
-				treballadors[posicioBuida][ID_USUARI_TREBALLADOR] = treballador.usuari;
-				treballadors[posicioBuida][ID_NOM] = treballador.nom;
-
-			} else if (treballadors[07][ID_DNI] != "") {
-				System.out.println("No es poden afegir més treballadors.");
-				break;
-			}
+			trobaBuitNom(treballadors);
+			int posicioBuida = trobaBuitNom(treballadors);
+		
 		}
 	}
 
@@ -321,13 +319,35 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
 		}
 	}
 
-	/*
-	 * boolean afegirTreballador(String[][] treballadors, Treballador treballador) {
-	 * // TODO }
-	 * 
-	 * boolean existeixTreballador(String[][] treballadors, String nif) { while }
-	 */
-	void mostrarTreballadors(String[][] treballadors) { // TODO }
+	boolean afegirTreballador(String[][] treballadors, Treballador treballador) {
+		boolean afegirAra = false;
+		int i = 0;
+		while (i < treballadors.length && !afegirAra) {
+			if (treballadors[i][ID_NIF_TREBALLADOR].equals("")) {
+				treballadors[i][ID_NIF_TREBALLADOR] = treballador.nif;
+				treballadors[i][ID_USUARI_TREBALLADOR] = treballador.usuari;
+				treballadors[i][ID_NOM] = treballador.nom;
+				afegirAra = true;
+			}
+			i++;
+		}
+		return afegirAra;
+	}
+
+	// ESTO PARECE QUE NO FUNCIONA O NO HACE NADA
+	boolean existeixTreballador(String[][] treballadors, String nif) {
+		boolean existent = false;
+		int i = 0;
+		while (i < treballadors.length && !existent) {
+			if (treballadors[i][ID_NIF_TREBALLADOR] == nif) {
+				existent = true;
+			}
+			i++;
+		}
+		return existent;
+	}
+
+	void mostrarTreballadors(String[][] treballadors) {
 		for (int i = 0; i < treballadors.length; i++) {
 			System.out.println(treballadors[i][ID_NOM] + "  " + treballadors[i][ID_USUARI_TREBALLADOR] + "  "
 					+ treballadors[i][ID_NIF_TREBALLADOR]);
