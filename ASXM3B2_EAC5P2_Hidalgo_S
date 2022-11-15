@@ -55,7 +55,7 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
         
 		Treballador treballador =new Treballador();
 		
-		copiaTreballador(treballadors,treballador);
+		
 		
         boolean calSortir = false;
         char opcio;
@@ -83,7 +83,8 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
                     mostraUsuaris(registre, criteris);
                     break;
                 case '5':
-                    altaTreballador(registre, treballador);
+                    altaTreballador(treballadors, treballador);
+                    copiaTreballador(registre,treballador);
                     break;
                 case '6':
                    mostrarTreballadors(treballadors);
@@ -226,39 +227,39 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
      * @param dni
      * @return
      */
-    int obtenirFilaPerDniDonatBaixa(String[][] registre, String dni) {
-        boolean trobat = false;
-        int posicio = 0;
-        while (!trobat && posicio < registre.length) {
-            if (registre[posicio][ID_DNI].equals(dni) && !registre[posicio][ID_DATA_BAIXA].equals("")) {
-                trobat = true;
-            } else {
-                posicio++;
-            }
-        }
-        if (trobat) {
-            return posicio;
-        } else {
-            return REG_INEXISTENT;
-        }
-    }
+	int obtenirFilaPerDniDonatBaixa(String[][] registre, String dni) {
+		boolean trobat = false;
+		int posicio = 0;
+		while (!trobat && posicio < registre.length) {
+			if (registre[posicio][ID_DNI].equals(dni) && !registre[posicio][ID_DATA_BAIXA].equals("")) {
+				trobat = true;
+			} else {
+				posicio++;
+			}
+		}
+		if (trobat) {
+			return posicio;
+		} else {
+			return REG_INEXISTENT;
+		}
+	}
 
-    int obtenirFilaPerDonarAlta(String[][] registre) {
-        boolean trobat = false;
-        int posicio = 0;
-        while (!trobat && posicio < registre.length) {
-            if (registre[posicio][ID_USUARI].equals("")) {
-                trobat = true;
-            } else {
-                posicio++;
-            }
-        }
-        if (trobat) {
-            return posicio;
-        } else {
-            return REG_INEXISTENT;
-        }
-    }
+	int obtenirFilaPerDonarAlta(String[][] registre) {
+		boolean trobat = false;
+		int posicio = 0;
+		while (!trobat && posicio < registre.length) {
+			if (registre[posicio][ID_USUARI].equals("")) {
+				trobat = true;
+			} else {
+				posicio++;
+			}
+		}
+		if (trobat) {
+			return posicio;
+		} else {
+			return REG_INEXISTENT;
+		}
+	}
 
 	void mostrarUsuarisEntreAnyAltaAndBaixa(String[][] registre, CriterisCercaUsuaris criteris) {
 		System.out.printf("\nUsuaris amb alta a l'any %s y baixa %s\n", criteris.anyAlta, criteris.anyBaixa);
@@ -283,7 +284,7 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
 		mostrarUsuarisEntreAnyAltaAndBaixa(registre, criteris);
 	}
 
-	void altaTreballador(String[][] registre, Treballador treballador) {
+	void altaTreballador(String[][] treballadors, Treballador treballador) {
 
 		System.out.println("Intro DNI nou treballador; ");
 		treballador.nif = scanner.nextLine();
@@ -292,24 +293,31 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
 		System.out.println("Intro NOM REAL nou treballador; ");
 		treballador.nom = scanner.nextLine();
 
-		trobaBuit(registre);
-		int posicioBuida = trobaBuit(registre);
-		if (posicioBuida != REG_INEXISTENT && registre[20][ID_DNI] == "") {
-			registre[posicioBuida][ID_USUARI] = treballador.usuari;
-			registre[posicioBuida][ID_DNI] = treballador.nif;
-						
-			
+		trobaBuitNom(treballadors);
+		int posicioBuida = trobaBuitNom(treballadors);
+		for (int i = 0; i < treballadors.length; i++) {
+			if (posicioBuida != REG_INEXISTENT && treballadors[07][ID_DNI] == "") {
+				treballadors[posicioBuida][ID_NIF_TREBALLADOR] = treballador.nif;
+				treballadors[posicioBuida][ID_USUARI_TREBALLADOR] = treballador.usuari;
+				treballadors[posicioBuida][ID_NOM] = treballador.nom;
+
+			} else if (treballadors[07][ID_DNI] != "") {
+				System.out.println("No es poden afegir més treballadors.");
+				break;
+			}
 		}
 	}
 
-	void copiaTreballador(String[][] treballadors, Treballador treballador) {
-		trobaBuit(treballadors);
-		int posicioBuida = trobaBuitNom(treballadors);
-		
-		for (int i = 0; i < treballadors.length; i++) {
-			treballadors[posicioBuida][ID_NIF_TREBALLADOR] = treballador.nif;
-			treballadors[posicioBuida][ID_USUARI_TREBALLADOR] = treballador.usuari;
-			treballadors[posicioBuida][ID_NOM] = treballador.nom;
+	void copiaTreballador(String[][] registre, Treballador treballador) {
+
+		trobaBuit(registre);
+		int posicioBuida = trobaBuitNom(registre);
+		for (int i = 0; i < registre.length; i++) {
+			if (posicioBuida != REG_INEXISTENT && registre[20][ID_DNI] == "") {
+				registre[posicioBuida][ID_DNI] = treballador.nif;
+				registre[posicioBuida][ID_USUARI] = treballador.usuari;
+
+			}
 		}
 	}
 
@@ -340,18 +348,19 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
 		}
 		return found ? position : -1;
 	}
-	// TROBA LA PRIMERA FILA TOTALMENT BUIDA PER AFEGIR REALS
-		int trobaBuitNom(String[][] treballadors) {
-			int position = 0;
-			boolean found = false;
-			while (position < treballadors.length && !found) {
-				if (treballadors[position][ID_NIF_TREBALLADOR].isEmpty()) {
-					found = true;
 
-				} else {
-					position++;
-				}
+	// TROBA LA PRIMERA FILA TOTALMENT BUIDA PER AFEGIR REALS
+	int trobaBuitNom(String[][] treballadors) {
+		int position = 0;
+		boolean found = false;
+		while (position < treballadors.length && !found) {
+			if (treballadors[position][ID_NIF_TREBALLADOR].isEmpty()) {
+				found = true;
+
+			} else {
+				position++;
 			}
-			return found ? position : -1;
 		}
+		return found ? position : -1;
+	}
 }
