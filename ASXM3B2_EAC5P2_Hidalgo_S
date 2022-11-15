@@ -83,11 +83,16 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
                     mostraUsuaris(registre, criteris);
                     break;
                 case '5':
+
                     altaTreballador(treballadors, treballador);
-                    afegirTreballador(treballadors, treballador);
+                    
                     //ESTO NO ME FUNCIONA
-                    existeixTreballador(treballadors, treballador);
+                    existeixTreballador(treballadors, treballador.nif);
+                    
+                    afegirTreballador(treballadors, treballador);
+
                     copiaTreballador(registre,treballador);
+
                     break;
                 case '6':
                    mostrarTreballadors(treballadors);
@@ -337,13 +342,14 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
 	}
 
 	// ESTO PARECE QUE NO FUNCIONA O NO HACE NADA
-	boolean existeixTreballador(String[][] treballadors, Treballador treballador) {
-		boolean existent = false;
+	boolean existeixTreballador(String[][] treballadors, String nif) {
+		boolean existent=false;
 		int i = 0;
 		while (i < treballadors.length && !existent) {
-			if (treballadors[i][ID_NIF_TREBALLADOR] == treballador.nif) {
+			if (treballadors[i][ID_NIF_TREBALLADOR] == nif) {
 				System.out.println("USUARI EXISTENT!!!!");
 				existent = true;
+				scanner.nextLine();
 			}
 			i++;
 		}
