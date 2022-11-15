@@ -88,7 +88,7 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
                     
                     //ESTO NO ME FUNCIONA
                     existeixTreballador(treballadors, treballador.nif);
-                    
+                    //NO
                     afegirTreballador(treballadors, treballador);
 
                     copiaTreballador(registre,treballador);
@@ -348,8 +348,7 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
 		while (i < treballadors.length && !existent) {
 			if (treballadors[i][ID_NIF_TREBALLADOR] == nif) {
 				System.out.println("USUARI EXISTENT!!!!");
-				existent = true;
-				scanner.nextLine();
+				existent = true;			
 			}
 			i++;
 		}
