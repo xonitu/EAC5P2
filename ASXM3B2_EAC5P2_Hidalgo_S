@@ -51,137 +51,125 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
         String[][] treballadors = {{"11222333A", "jpuig", "Josep Puig"},
         {"34985423A", "fgarcia", "Francesc Garcia"}, {"", "", ""}, {"", "", ""}, {"", "", ""}, {"", "", ""}, {"", "", ""}, {"", "", ""}};
 		
-        CriterisCercaUsuaris criteris = new CriterisCercaUsuaris();
-        
-		Treballador treballador =new Treballador();
-		
-		
-		
-        boolean calSortir = false;
-        char opcio;
-        do {
-            System.out.println("");
-            System.out.println("1. Reactivar un usuari");
-            System.out.println("2. Donar de baixa un usuari");
-            System.out.println("3. Mostrar registre");
-            System.out.println("4. Mostrar Usuaris entre any alta i baixa");
-            System.out.println("5. Alta Treballadors");
-            System.out.println("6. Mostrar Treballadors");
-            System.out.println("0. Sortir de l'aplicaciÃ³");
-            opcio = demanarOpcioMenu();
-            switch (opcio) {
-                case '1':
-                    reactivarUsuariDeBaixa(registre);
-                    break;
-                case '2':
-                    donarDeBaixa(registre);
-                    break;
-                case '3':
-                    mostrarRegistre(registre);
-                    break;
-                case '4':
-                    mostraUsuaris(registre, criteris);
-                    break;
-                case '5':
+		CriterisCercaUsuaris criteris = new CriterisCercaUsuaris();
 
-                    altaTreballador(treballadors, treballador);
-                    
-                    //ESTO NO ME FUNCIONA
-                    existeixTreballador(treballadors, treballador.nif);
-                    //NO
-                    afegirTreballador(treballadors, treballador);
+		boolean calSortir = false;
+		char opcio;
+		do {
+			System.out.println("");
+			System.out.println("1. Reactivar un usuari");
+			System.out.println("2. Donar de baixa un usuari");
+			System.out.println("3. Mostrar registre");
+			System.out.println("4. Mostrar Usuaris entre any alta i baixa");
+			System.out.println("5. Alta Treballadors");
+			System.out.println("6. Mostrar Treballadors");
+			System.out.println("0. Sortir de l'aplicaciÃ³");
+			opcio = demanarOpcioMenu();
+			switch (opcio) {
+			case '1':
+				reactivarUsuariDeBaixa(registre);
+				break;
+			case '2':
+				donarDeBaixa(registre);
+				break;
+			case '3':
+				mostrarRegistre(registre);
+				break;
+			case '4':
+				mostraUsuaris(registre, criteris);
+				break;
+			case '5':
+				altaTreballador(treballadors, registre);
 
-                    copiaTreballador(registre,treballador);
+				break;
+			case '6':
+				mostrarTreballadors(treballadors);
+				break;
+			case '0':
+				calSortir = true;
+			}
+		} while (!calSortir);
+	}
 
-                    break;
-                case '6':
-                   mostrarTreballadors(treballadors);
-                    break;
-                case '0':
-                    calSortir = true;
-            }
-        } while (!calSortir);
-    }
+	char demanarOpcioMenu() {
+		String resp;
+		System.out.print("Esculliu una opciÃ³ (1,2,3 o 0) i premeu [ENTRAR]: ");
+		resp = scanner.nextLine();
+		if (resp.isEmpty()) {
+			resp = " ";
+		}
+		return resp.charAt(0);
+	}
 
-    char demanarOpcioMenu() {
-        String resp;
-        System.out.print("Esculliu una opciÃ³ (1,2,3 o 0) i premeu [ENTRAR]: ");
-        resp = scanner.nextLine();
-        if (resp.isEmpty()) {
-            resp = " ";
-        }
-        return resp.charAt(0);
-    }
+	/**
+	 * MÃ¨tode que realitza l'assignacio d'un dispositiu a una persona
+	 *
+	 * @param registre
+	 */
+	void reactivarUsuariDeBaixa(String[][] registre) {
+		String dni;
+		String usuari = "";
+		String dataAlta = "";
+		int fila = 0;
+		System.out.println("Reactivar usuari");
+		System.out.println("================");
+		System.out.print("Dni: ");
+		dni = scanner.nextLine();
+		fila = obtenirFilaPerDniUsuariActiu(registre, dni);
+		if (fila != REG_INEXISTENT) {
+			System.out.println("Aquest usuari estÃ  en actiu");
+		} else if (obtenirFilaPerDniDonatBaixa(registre, dni) == REG_INEXISTENT) {
+			System.out.println("Aquest usuari no existeix");
+		} else {
+			fila = obtenirFilaPerDniDonatBaixa(registre, dni);
+			usuari = obtenirUsuariPerFila(registre, fila);
+			System.out.println("Usuari: " + usuari);
+			System.out.print("Data Alta: ");
+			dataAlta = scanner.nextLine();
+			fila = obtenirFilaPerDonarAlta(registre);
+			if (fila == REG_INEXISTENT) {
+				System.out.println("No hi ha files disponibles");
+			} else {
+				registre[fila][ID_USUARI] = usuari;
+				registre[fila][ID_DNI] = dni;
+				registre[fila][ID_DATA_ALTA] = dataAlta;
+				registre[fila][ID_DATA_BAIXA] = "";
+			}
+		}
+	}
 
-    /**
-     * MÃ¨tode que realitza l'assignacio d'un dispositiu a una persona
-     *
-     * @param registre
-     */
-    void reactivarUsuariDeBaixa(String[][] registre) {
-        String dni;
-        String usuari = "";
-        String dataAlta = "";
-        int fila = 0;
-        System.out.println("Reactivar usuari");
-        System.out.println("================");
-        System.out.print("Dni: ");
-        dni = scanner.nextLine();
-        fila = obtenirFilaPerDniUsuariActiu(registre, dni);
-        if (fila != REG_INEXISTENT) {
-            System.out.println("Aquest usuari estÃ  en actiu");
-        } else if (obtenirFilaPerDniDonatBaixa(registre, dni) == REG_INEXISTENT) {
-            System.out.println("Aquest usuari no existeix");
-        } else {
-            fila = obtenirFilaPerDniDonatBaixa(registre, dni);
-            usuari = obtenirUsuariPerFila(registre, fila);
-            System.out.println("Usuari: " + usuari);
-            System.out.print("Data Alta: ");
-            dataAlta = scanner.nextLine();
-            fila = obtenirFilaPerDonarAlta(registre);
-            if (fila == REG_INEXISTENT) {
-                System.out.println("No hi ha files disponibles");
-            } else {
-                registre[fila][ID_USUARI] = usuari;
-                registre[fila][ID_DNI] = dni;
-                registre[fila][ID_DATA_ALTA] = dataAlta;
-                registre[fila][ID_DATA_BAIXA] = "";
-            }
-        }
-    }
+	/**
+	 * * MÃ¨tode que realitza la cancelÂ·laciÃ³ de l'assignaciÃ³ d'un dispositiu a
+	 * una personarva
+	 *
+	 * @param registre
+	 */
+	void donarDeBaixa(String[][] registre) {
+		String dni;
+		String usuari = "";
+		String dataBaixa = "";
+		int fila = 0;
+		System.out.println("Donar de baixa");
+		System.out.println("==============");
+		System.out.print("Dni: ");
+		dni = scanner.nextLine();
+		fila = obtenirFilaPerDniUsuariActiu(registre, dni);
+		if (fila == REG_INEXISTENT) {
+			System.out.println("Aquest usuari no existeix o no estÃ  en actiu");
+		} else {
+			usuari = obtenirUsuariPerFila(registre, fila);
+			System.out.println("Usuari: " + usuari);
+			System.out.print("Data Baixa: ");
+			dataBaixa = scanner.nextLine();
+			registre[fila][ID_DATA_BAIXA] = dataBaixa;
+		}
+	}
 
-    /**
-     * * MÃ¨tode que realitza la cancelÂ·laciÃ³ de l'assignaciÃ³ d'un dispositiu a
-     * una personarva
-     *
-     * @param registre
-     */
-    void donarDeBaixa(String[][] registre) {
-        String dni;
-        String usuari = "";
-        String dataBaixa = "";
-        int fila = 0;
-        System.out.println("Donar de baixa");
-        System.out.println("==============");
-        System.out.print("Dni: ");
-        dni = scanner.nextLine();
-        fila = obtenirFilaPerDniUsuariActiu(registre, dni);
-        if (fila == REG_INEXISTENT) {
-            System.out.println("Aquest usuari no existeix o no estÃ  en actiu");
-        } else {
-            usuari = obtenirUsuariPerFila(registre, fila);
-            System.out.println("Usuari: " + usuari);
-            System.out.print("Data Baixa: ");
-            dataBaixa = scanner.nextLine();
-            registre[fila][ID_DATA_BAIXA] = dataBaixa;
-        }
-    }
-
-    /**
-     * MÃ¨tode que mostra el registre
-     *
-     * @param registre
-     */
+	/**
+	 * MÃ¨tode que mostra el registre
+	 *
+	 * @param registre
+	 */
 	void mostrarRegistre(String[][] registre) {
 		System.out.format("%-15s%-15s%-15s%-15s%n", "Usuari", "Dni", "Alta", "Baixa");
 		for (int fila = 0; fila < registre.length; fila++) {
@@ -293,34 +281,56 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
 		mostrarUsuarisEntreAnyAltaAndBaixa(registre, criteris);
 	}
 
-	void altaTreballador(String[][] treballadors, Treballador treballador) {
-		boolean seAcabo = false;
+	void altaTreballador(String[][] treballadors, String[][] registre) {
+
+		String nom, nif, usuari;
+		System.out.println("Intro DNI nou treballador; ");
+		nif = scanner.nextLine();
 
 		if (treballadors[07][ID_NIF_TREBALLADOR] != "") {
 			System.out.println("No es poden afegir més treballadors.");
-			seAcabo = false;
+
 		} else {
-			System.out.println("Intro DNI nou treballador; ");
-			treballador.nif = scanner.nextLine();
-			System.out.println("Intro NICK nou treballador; ");
-			treballador.usuari = scanner.nextLine();
-			System.out.println("Intro NOM REAL nou treballador; ");
-			treballador.nom = scanner.nextLine();
 
-			trobaBuitNom(treballadors);
-			int posicioBuida = trobaBuitNom(treballadors);
+			if (existeixTreballador(treballadors, nif, "")) {
+				System.out.println("Aquest dni ja existeix");
+			} else {
+				System.out.println("Intro Nick nou treballador; ");
+				usuari = scanner.nextLine();
 
+				if (existeixTreballador(treballadors, "", usuari)) {
+					System.out.println("Aquest user ja existeix");
+				} else {
+					System.out.println("Intro Nom real nou treballador; ");
+					nom = scanner.nextLine();
+
+					trobaBuitNom(treballadors);
+					int posicioBuida = trobaBuitNom(treballadors);
+
+					Treballador treballador = new Treballador();
+					treballador.nif = nif;
+					treballador.usuari = usuari;
+					treballador.nom = nom;
+					if (afegirTreballador(treballadors, treballador)) {
+						System.out.println("Inserció correcte");
+						copiaTreballador(registre, nif, usuari);
+						// ___________________________________
+						// ___________________________________
+					}
+
+				}
+			}
 		}
 	}
 
-	void copiaTreballador(String[][] registre, Treballador treballador) {
+	void copiaTreballador(String[][] registre, String nif, String usuari) {
 
 		trobaBuit(registre);
 		int posicioBuida = trobaBuitNom(registre);
 		for (int i = 0; i < registre.length; i++) {
 			if (posicioBuida != REG_INEXISTENT && registre[20][ID_DNI] == "") {
-				registre[posicioBuida][ID_DNI] = treballador.nif;
-				registre[posicioBuida][ID_USUARI] = treballador.usuari;
+				registre[posicioBuida][ID_DNI] = nif;
+				registre[posicioBuida][ID_USUARI] = usuari;
 
 			}
 		}
@@ -341,16 +351,20 @@ public class ASXM3B2_EAC5P2_Hidalgo_S {
 		return afegirAra;
 	}
 
-	// ESTO PARECE QUE NO FUNCIONA O NO HACE NADA
-	boolean existeixTreballador(String[][] treballadors, String nif) {
-		boolean existent=false;
+	boolean existeixTreballador(String[][] treballadors, String nif, String usuari) {
+
+		boolean existent = false;
 		int i = 0;
 		while (i < treballadors.length && !existent) {
-			if (treballadors[i][ID_NIF_TREBALLADOR] == nif) {
-				System.out.println("USUARI EXISTENT!!!!");
-				existent = true;			
+			if (!"".equals(treballadors[i][ID_NIF_TREBALLADOR])) {
+				if (treballadors[i][ID_NIF_TREBALLADOR].equals(nif)
+						|| treballadors[i][ID_USUARI_TREBALLADOR].equals(usuari)) {
+					System.out.println("USUARI EXISTENT!!!!");
+					existent = true;
+				}
 			}
 			i++;
+
 		}
 		return existent;
 	}
